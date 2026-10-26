@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Customers')}"></head>
+<body>
+<div class="app-shell">
+    <aside th:replace="~{fragments/layout :: sidebar(${activeNav})}"></aside>
+    <section class="app-main">
+        <header th:replace="~{fragments/layout :: topbar('Customers', 'Profiles and home-address data from ECOMM.CUSTOMERS')}"></header>
+        <main class="content">
+            <div th:replace="~{fragments/layout :: flash}"></div>
+            <section class="toolbar">
+                <form class="search-form" th:action="@{/ui/customers}" method="get">
+                    <label class="search-field">
+                        <span aria-hidden="true">⌕</span>
+                        <input type="search" name="search" th:value="${search}" placeholder="Search name or email">
+                    </label>
+                    <button class="button button-secondary" type="submit">Search</button>
+                    <a class="text-link" th:if="${search}" th:href="@{/ui/customers}">Clear</a>
+                </form>
+                <span class="result-count"><strong th:text="${page.totalElements()}">20</strong> customers</span>
+            </section>
+            <section class="card table-card">
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Customer</th><th>Email</th><th>Home city</th><th>Status</th><th>Updated</th><th></th></tr></thead>
+                        <tbody>
+                        <tr th:each="customer : ${page.content()}">
+                            <td>
+                                <div class="entity-cell"><span class="entity-avatar" th:text="${#strings.substring(customer.name(), 0, 1)}">C</span>
+                                    <div><strong th:text="${customer.name()}">Customer</strong><small th:text="${'#' + customer.id()}">#5001</small></div>
+                                </div>
+                            </td>
+                            <td th:text="${customer.email()}">customer@example.test</td>
+                            <td th:text="${customer.homeAddress().city()}">City</td>
+                            <td><span class="badge" th:classappend="${customer.active()} ? ' badge-active' : ' badge-inactive'" th:text="${customer.active()} ? 'Active' : 'Inactive'">Active</span></td>
+                            <td th:text="${#temporals.format(customer.updatedAt(), 'MMM d, yyyy')}">Jan 1, 2025</td>
+                            <td class="align-right"><a class="button button-small button-secondary" th:href="@{/ui/customers/{id}/edit(id=${customer.id()})}">Edit</a></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination">
+                    <a th:classappend="${page.first()} ? ' disabled'" th:href="@{/ui/customers(page=${page.page() - 1},search=${search})}">← Previous</a>
+                    <span>Page <strong th:text="${page.page() + 1}">1</strong> of <strong th:text="${page.totalPages() == 0 ? 1 : page.totalPages()}">2</strong></span>
+                    <a th:classappend="${page.last()} ? ' disabled'" th:href="@{/ui/customers(page=${page.page() + 1},search=${search})}">Next →</a>
+                </div>
+            </section>
+        </main>
+    </section>
+</div>
+</body>
+</html>

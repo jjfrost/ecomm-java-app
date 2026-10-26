@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Inventory')}"></head>
+<body>
+<div class="app-shell">
+    <aside th:replace="~{fragments/layout :: sidebar(${activeNav})}"></aside>
+    <section class="app-main">
+        <header th:replace="~{fragments/layout :: topbar('Inventory', 'On-hand, reserved, and available stock')}"></header>
+        <main class="content">
+            <div th:replace="~{fragments/layout :: flash}"></div>
+            <section class="toolbar">
+                <form class="search-form" th:action="@{/ui/inventory}" method="get">
+                    <label class="search-field"><span>⌕</span><input type="search" name="location" th:value="${location}" placeholder="Filter by location"></label>
+                    <label class="check-field"><input type="checkbox" name="reorderOnly" value="true" th:checked="${reorderOnly}"><span>Reorder only</span></label>
+                    <button class="button button-secondary" type="submit">Apply</button>
+                </form>
+                <span class="result-count"><strong th:text="${page.totalElements()}">20</strong> stock records</span>
+            </section>
+            <section class="card table-card">
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Inventory</th><th>Product</th><th>Location</th><th class="align-right">On hand</th><th class="align-right">Reserved</th><th class="align-right">Available</th><th>Status</th><th></th></tr></thead>
+                        <tbody>
+                        <tr th:each="item : ${page.content()}">
+                            <td class="mono" th:text="${'#' + item.inventoryId()}">#8001</td>
+                            <td th:text="${'#' + item.productId()}">#7001</td>
+                            <td><span class="location-pill" th:text="${item.location()}">BIN-001</span></td>
+                            <td class="align-right" th:text="${#numbers.formatDecimal(item.quantityOnHand(), 1, 2)}">101</td>
+                            <td class="align-right" th:text="${#numbers.formatDecimal(item.quantityReserved(), 1, 2)}">0</td>
+                            <td class="align-right"><strong th:text="${#numbers.formatDecimal(item.quantityAvailable(), 1, 2)}">101</strong></td>
+                            <td><span class="badge" th:classappend="${item.reorderRequired()} ? ' badge-warning' : ' badge-active'" th:text="${item.reorderRequired()} ? 'Reorder' : 'Healthy'">Healthy</span></td>
+                            <td class="align-right"><a class="button button-small button-secondary" th:href="@{/ui/inventory/{id}/adjust(id=${item.inventoryId()})}">Adjust</a></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination">
+                    <a th:classappend="${page.first()} ? ' disabled'" th:href="@{/ui/inventory(page=${page.page() - 1},location=${location},reorderOnly=${reorderOnly})}">← Previous</a>
+                    <span>Page <strong th:text="${page.page() + 1}">1</strong> of <strong th:text="${page.totalPages() == 0 ? 1 : page.totalPages()}">2</strong></span>
+                    <a th:classappend="${page.last()} ? ' disabled'" th:href="@{/ui/inventory(page=${page.page() + 1},location=${location},reorderOnly=${reorderOnly})}">Next →</a>
+                </div>
+            </section>
+        </main>
+    </section>
+</div>
+</body>
+</html>

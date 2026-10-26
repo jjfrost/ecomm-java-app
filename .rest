@@ -1,0 +1,71 @@
+@baseUrl = http://localhost:8080
+@token = replace-with-a-valid-jwt
+
+### Health
+GET {{baseUrl}}/actuator/health
+
+### List employees
+GET {{baseUrl}}/api/employees
+Authorization: Bearer {{token}}
+
+### Get employee
+GET {{baseUrl}}/api/employees/105
+Authorization: Bearer {{token}}
+
+### Create employee
+POST {{baseUrl}}/api/employees
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "firstName": "John",
+  "lastName": "Doe",
+  "email": "john.doe@example.com",
+  "phoneNumber": "123-456-7890",
+  "hireDate": "2025-03-27",
+  "jobId": "PU_MAN",
+  "salary": 60000.00,
+  "commissionPct": 0.10,
+  "managerId": 103,
+  "departmentId": 10
+}
+
+### Update employee
+PUT {{baseUrl}}/api/employees/209
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "firstName": "Jane",
+  "lastName": "Doe",
+  "email": "jane.doe@example.com",
+  "phoneNumber": "987-654-3210",
+  "hireDate": "2025-03-27",
+  "jobId": "PU_MAN",
+  "salary": 95000.00,
+  "commissionPct": 0.15,
+  "managerId": 103,
+  "departmentId": 20
+}
+
+### Assign manager
+POST {{baseUrl}}/api/employees/105/assign-manager
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "managerId": 209
+}
+
+### Promote employee
+POST {{baseUrl}}/api/employees/105/promote
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "raisePercentage": 25
+}
+
+### Delete employee
+DELETE {{baseUrl}}/api/employees/209
+Authorization: Bearer {{token}}

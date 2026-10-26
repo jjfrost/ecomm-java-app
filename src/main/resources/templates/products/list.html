@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Products')}"></head>
+<body>
+<div class="app-shell">
+    <aside th:replace="~{fragments/layout :: sidebar(${activeNav})}"></aside>
+    <section class="app-main">
+        <header th:replace="~{fragments/layout :: topbar('Products', 'Catalog pricing and category assignments')}"></header>
+        <main class="content">
+            <div th:replace="~{fragments/layout :: flash}"></div>
+            <section class="toolbar">
+                <form class="search-form" th:action="@{/ui/products}" method="get">
+                    <label class="search-field"><span>⌕</span><input type="search" name="search" th:value="${search}" placeholder="Search SKU, name, or description"></label>
+                    <button class="button button-secondary" type="submit">Search</button>
+                    <a class="text-link" th:if="${search}" th:href="@{/ui/products}">Clear</a>
+                </form>
+                <span class="result-count"><strong th:text="${page.totalElements()}">20</strong> products</span>
+            </section>
+            <section class="card table-card">
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Product</th><th>SKU</th><th>Category</th><th class="align-right">Price</th><th>Status</th><th></th></tr></thead>
+                        <tbody>
+                        <tr th:each="product : ${page.content()}">
+                            <td><div class="entity-cell"><span class="product-thumb">◇</span><div><strong th:text="${product.name()}">Product</strong><small th:text="${'#' + product.id()}">#7001</small></div></div></td>
+                            <td class="mono" th:text="${product.sku()}">SKU</td>
+                            <td th:text="${product.categoryName()}">Category</td>
+                            <td class="align-right currency" th:text="${'$' + #numbers.formatDecimal(product.price(), 1, 2)}">$99.00</td>
+                            <td><span class="badge" th:classappend="${product.active()} ? ' badge-active' : ' badge-inactive'" th:text="${product.active()} ? 'Active' : 'Draft'">Active</span></td>
+                            <td class="align-right"><a class="button button-small button-secondary" th:href="@{/ui/products/{id}/edit(id=${product.id()})}">Edit</a></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination">
+                    <a th:classappend="${page.first()} ? ' disabled'" th:href="@{/ui/products(page=${page.page() - 1},search=${search})}">← Previous</a>
+                    <span>Page <strong th:text="${page.page() + 1}">1</strong> of <strong th:text="${page.totalPages() == 0 ? 1 : page.totalPages()}">2</strong></span>
+                    <a th:classappend="${page.last()} ? ' disabled'" th:href="@{/ui/products(page=${page.page() + 1},search=${search})}">Next →</a>
+                </div>
+            </section>
+        </main>
+    </section>
+</div>
+</body>
+</html>

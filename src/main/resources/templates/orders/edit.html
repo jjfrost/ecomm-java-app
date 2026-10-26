@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Manage order')}"></head>
+<body>
+<div class="app-shell">
+    <aside th:replace="~{fragments/layout :: sidebar(${activeNav})}"></aside>
+    <section class="app-main">
+        <header th:replace="~{fragments/layout :: topbar('Manage order', 'Review lines and advance the order lifecycle')}"></header>
+        <main class="content narrow-content">
+            <a class="back-link" th:href="@{/ui/orders}">← Back to orders</a>
+            <section class="card form-card">
+                <div class="record-heading"><span class="metric-icon metric-amber">▤</span><div><h2 th:text="${'Order #' + order.orderId()}">Order</h2><p th:text="${'Customer #' + order.customerId()}">Customer</p></div><span class="badge" th:classappend="${' badge-' + #strings.toLowerCase(order.status().name())}" th:text="${order.status()}">DELIVERED</span></div>
+                <div class="inventory-summary">
+                    <div><small>Order date</small><strong th:text="${#temporals.format(order.orderDate(), 'MMM d, yyyy')}">Date</strong></div>
+                    <div><small>Line items</small><strong th:text="${order.items().size()}">1</strong></div>
+                    <div><small>Total</small><strong class="currency" th:text="${'$' + #numbers.formatDecimal(order.totalAmount(), 1, 2)}">$100</strong></div>
+                </div>
+                <div class="alert alert-error" th:if="${error}"><span>!</span><span th:text="${error}">Error</span></div>
+                <div class="empty-state compact" th:if="${#lists.isEmpty(transitions)}"><strong>No status changes available</strong><p>This order is in a terminal state or must use a dedicated cancellation workflow.</p></div>
+                <form class="data-form" th:unless="${#lists.isEmpty(transitions)}" th:action="@{/ui/orders/{id}/status(id=${order.orderId()})}" th:object="${form}" method="post">
+                    <div class="form-section">
+                        <div class="section-title"><h3>Advance status</h3><p>Only transitions permitted by the order state machine are shown.</p></div>
+                        <div class="form-grid">
+                            <label class="field"><span>New status</span><select th:field="*{status}"><option value="">Select status</option><option th:each="status : ${transitions}" th:value="${status}" th:text="${status}">Status</option></select><small class="field-error" th:errors="*{status}"></small></label>
+                            <label class="field"><span>Changed by</span><input th:field="*{changedBy}" type="text"><small class="field-error" th:errors="*{changedBy}"></small></label>
+                            <label class="field field-wide"><span>Notes</span><textarea th:field="*{notes}" rows="3"></textarea><small class="field-error" th:errors="*{notes}"></small></label>
+                        </div>
+                    </div>
+                    <div class="form-actions"><a class="button button-secondary" th:href="@{/ui/orders}">Cancel</a><button class="button button-primary" type="submit">Update status</button></div>
+                </form>
+            </section>
+        </main>
+    </section>
+</div>
+</body>
+</html>

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Adjust inventory')}"></head>
+<body>
+<div class="app-shell">
+    <aside th:replace="~{fragments/layout :: sidebar(${activeNav})}"></aside>
+    <section class="app-main">
+        <header th:replace="~{fragments/layout :: topbar('Adjust inventory', 'Apply a controlled Oracle package adjustment')}"></header>
+        <main class="content narrow-content">
+            <a class="back-link" th:href="@{/ui/inventory}">← Back to inventory</a>
+            <section class="card form-card">
+                <div class="record-heading"><span class="metric-icon metric-teal">▦</span><div><h2 th:text="${'Inventory #' + inventory.inventoryId()}">Inventory</h2><p><span th:text="${'Product #' + inventory.productId()}">Product</span> · <span th:text="${inventory.location()}">Location</span></p></div></div>
+                <div class="inventory-summary">
+                    <div><small>On hand</small><strong th:text="${inventory.quantityOnHand()}">101</strong></div>
+                    <div><small>Reserved</small><strong th:text="${inventory.quantityReserved()}">0</strong></div>
+                    <div><small>Available</small><strong th:text="${inventory.quantityAvailable()}">101</strong></div>
+                    <div><small>Maximum</small><strong th:text="${inventory.maximumStock()}">500</strong></div>
+                </div>
+                <div class="alert alert-error" th:if="${error}"><span>!</span><span th:text="${error}">Error</span></div>
+                <form class="data-form" th:action="@{/ui/inventory/{id}/adjust(id=${inventory.inventoryId()})}" th:object="${form}" method="post">
+                    <div class="form-section">
+                        <div class="section-title"><h3>Stock adjustment</h3><p>Positive values add stock; negative values remove stock.</p></div>
+                        <div class="form-grid">
+                            <label class="field"><span>Quantity change</span><input th:field="*{quantityDelta}" type="number" step="0.01"><small class="field-error" th:errors="*{quantityDelta}"></small></label>
+                            <label class="field"><span>Performed by</span><input th:field="*{performedBy}" type="text"><small class="field-error" th:errors="*{performedBy}"></small></label>
+                            <label class="field field-wide"><span>Reason</span><textarea th:field="*{reason}" rows="3" placeholder="Explain why this adjustment is required"></textarea><small class="field-error" th:errors="*{reason}"></small></label>
+                        </div>
+                    </div>
+                    <div class="form-actions"><a class="button button-secondary" th:href="@{/ui/inventory}">Cancel</a><button class="button button-primary" type="submit">Apply adjustment</button></div>
+                </form>
+            </section>
+        </main>
+    </section>
+</div>
+</body>
+</html>

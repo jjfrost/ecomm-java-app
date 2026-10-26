@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Orders')}"></head>
+<body>
+<div class="app-shell">
+    <aside th:replace="~{fragments/layout :: sidebar(${activeNav})}"></aside>
+    <section class="app-main">
+        <header th:replace="~{fragments/layout :: topbar('Orders', 'Order lifecycle and fulfillment readiness')}"></header>
+        <main class="content">
+            <div th:replace="~{fragments/layout :: flash}"></div>
+            <section class="toolbar">
+                <form class="search-form" th:action="@{/ui/orders}" method="get">
+                    <label class="select-field"><span>Status</span><select name="status"><option value="">All statuses</option><option th:each="status : ${statuses}" th:value="${status}" th:text="${status}" th:selected="${status == selectedStatus}">Status</option></select></label>
+                    <button class="button button-secondary" type="submit">Apply</button>
+                </form>
+                <span class="result-count"><strong th:text="${page.totalElements()}">20</strong> orders</span>
+            </section>
+            <section class="card table-card">
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Order</th><th>Customer</th><th>Date</th><th>Status</th><th>Items</th><th class="align-right">Total</th><th></th></tr></thead>
+                        <tbody>
+                        <tr th:each="order : ${page.content()}">
+                            <td><strong class="mono" th:text="${'#' + order.orderId()}">#25001</strong></td>
+                            <td th:text="${'#' + order.customerId()}">#5001</td>
+                            <td th:text="${#temporals.format(order.orderDate(), 'MMM d, yyyy')}">Jan 1</td>
+                            <td><span class="badge" th:classappend="${' badge-' + #strings.toLowerCase(order.status().name())}" th:text="${order.status()}">DELIVERED</span></td>
+                            <td th:text="${order.items().size()}">1</td>
+                            <td class="align-right currency" th:text="${'$' + #numbers.formatDecimal(order.totalAmount(), 1, 2)}">$100.00</td>
+                            <td class="align-right"><a class="button button-small button-secondary" th:href="@{/ui/orders/{id}/edit(id=${order.orderId()})}">Manage</a></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="pagination">
+                    <a th:classappend="${page.first()} ? ' disabled'" th:href="@{/ui/orders(page=${page.page() - 1},status=${selectedStatus})}">← Previous</a>
+                    <span>Page <strong th:text="${page.page() + 1}">1</strong> of <strong th:text="${page.totalPages() == 0 ? 1 : page.totalPages()}">2</strong></span>
+                    <a th:classappend="${page.last()} ? ' disabled'" th:href="@{/ui/orders(page=${page.page() + 1},status=${selectedStatus})}">Next →</a>
+                </div>
+            </section>
+        </main>
+    </section>
+</div>
+</body>
+</html>

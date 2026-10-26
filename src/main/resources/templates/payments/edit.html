@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Manage payment')}"></head>
+<body>
+<div class="app-shell">
+    <aside th:replace="~{fragments/layout :: sidebar(${activeNav})}"></aside>
+    <section class="app-main">
+        <header th:replace="~{fragments/layout :: topbar('Manage payment', 'Apply a validated payment-state transition')}"></header>
+        <main class="content narrow-content">
+            <a class="back-link" th:href="@{/ui/payments}">← Back to payments</a>
+            <section class="card form-card">
+                <div class="record-heading"><span class="metric-icon metric-green">◫</span><div><h2 th:text="${'Payment #' + payment.paymentId()}">Payment</h2><p class="mono" th:text="${payment.processorTransactionId()}">Transaction</p></div><span class="badge badge-payment" th:text="${#strings.replace(payment.paymentStatus().name(), '_', ' ')}">STATUS</span></div>
+                <div class="inventory-summary">
+                    <div><small>Order</small><strong th:text="${'#' + payment.orderId()}">#25001</strong></div>
+                    <div><small>Method</small><strong th:text="${#strings.replace(payment.paymentMethod().name(), '_', ' ')}">CARD</strong></div>
+                    <div><small>Amount</small><strong class="currency" th:text="${'$' + #numbers.formatDecimal(payment.amount(), 1, 2)}">$100</strong></div>
+                </div>
+                <div class="alert alert-error" th:if="${error}"><span>!</span><span th:text="${error}">Error</span></div>
+                <form class="data-form" th:action="@{/ui/payments/{id}/status(id=${payment.paymentId()})}" th:object="${form}" method="post">
+                    <div class="form-section">
+                        <div class="section-title"><h3>Payment state</h3><p>The payment service validates every requested transition.</p></div>
+                        <div class="form-grid">
+                            <label class="field"><span>New status</span><select th:field="*{status}"><option value="">Select status</option><option th:each="status : ${statuses}" th:value="${status}" th:text="${#strings.replace(status.name(), '_', ' ')}">Status</option></select><small class="field-error" th:errors="*{status}"></small></label>
+                            <label class="field"><span>Paid at (UTC)</span><input th:field="*{paidAt}" type="datetime-local"><small>Required for captured or settled states.</small></label>
+                            <label class="field"><span>Confirmation</span><input th:field="*{confirmation}" type="text"><small class="field-error" th:errors="*{confirmation}"></small></label>
+                            <label class="field"><span>Failure reason</span><input th:field="*{failureReason}" type="text"><small>Required when moving to failed.</small><small class="field-error" th:errors="*{failureReason}"></small></label>
+                        </div>
+                    </div>
+                    <div class="form-actions"><a class="button button-secondary" th:href="@{/ui/payments}">Cancel</a><button class="button button-primary" type="submit">Update payment</button></div>
+                </form>
+            </section>
+        </main>
+    </section>
+</div>
+</body>
+</html>

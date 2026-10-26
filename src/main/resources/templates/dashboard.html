@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Overview')}"></head>
+<body>
+<div class="app-shell">
+    <aside th:replace="~{fragments/layout :: sidebar(${activeNav})}"></aside>
+    <section class="app-main">
+        <header th:replace="~{fragments/layout :: topbar('Overview', 'Live commerce operations from Oracle')}"></header>
+        <main class="content">
+            <div th:replace="~{fragments/layout :: flash}"></div>
+
+            <section class="connection-banner">
+                <div class="connection-icon">DB</div>
+                <div class="connection-copy">
+                    <span class="eyebrow">Live database connection</span>
+                    <h2>
+                        <span class="connection-pulse"></span>
+                        Oracle is connected
+                    </h2>
+                    <p>
+                        <strong th:text="${oracle.sessionUser()}">ECOMM</strong>
+                        <span>on</span>
+                        <span th:text="${oracle.serviceName()}">testpdb</span>
+                        <span>· target schema</span>
+                        <strong th:text="${oracle.applicationSchema()}">ECOMM</strong>
+                    </p>
+                </div>
+                <div class="connection-meta">
+                    <span th:text="${oracle.databaseName()}">TESTPDB</span>
+                    <small th:text="${oracle.version()}">Oracle Database</small>
+                </div>
+            </section>
+
+            <section class="metric-grid" aria-label="Commerce totals">
+                <a class="metric-card" th:href="@{/ui/customers}">
+                    <span class="metric-icon metric-blue">◎</span>
+                    <span class="metric-copy"><small>Customers</small><strong th:text="${customersCount}">20</strong></span>
+                    <span class="metric-arrow">→</span>
+                </a>
+                <a class="metric-card" th:href="@{/ui/products}">
+                    <span class="metric-icon metric-violet">◇</span>
+                    <span class="metric-copy"><small>Products</small><strong th:text="${productsCount}">20</strong></span>
+                    <span class="metric-arrow">→</span>
+                </a>
+                <a class="metric-card" th:href="@{/ui/inventory}">
+                    <span class="metric-icon metric-teal">▦</span>
+                    <span class="metric-copy"><small>Inventory locations</small><strong th:text="${inventoryCount}">20</strong></span>
+                    <span class="metric-arrow">→</span>
+                </a>
+                <a class="metric-card" th:href="@{/ui/orders}">
+                    <span class="metric-icon metric-amber">▤</span>
+                    <span class="metric-copy"><small>Orders</small><strong th:text="${ordersCount}">20</strong></span>
+                    <span class="metric-arrow">→</span>
+                </a>
+                <a class="metric-card" th:href="@{/ui/payments}">
+                    <span class="metric-icon metric-green">◫</span>
+                    <span class="metric-copy"><small>Payments</small><strong th:text="${paymentsCount}">20</strong></span>
+                    <span class="metric-arrow">→</span>
+                </a>
+            </section>
+
+            <section class="dashboard-grid">
+                <div class="activity-column">
+                    <article class="card">
+                        <div class="card-header">
+                            <div><span class="eyebrow">Commerce activity</span><h2>Recent orders</h2></div>
+                            <a class="text-link" th:href="@{/ui/orders}">View all →</a>
+                        </div>
+                        <div class="table-wrap">
+                            <table>
+                                <thead><tr><th>Order</th><th>Customer</th><th>Status</th><th class="align-right">Total</th></tr></thead>
+                                <tbody>
+                                <tr th:each="order : ${recentOrders}">
+                                    <td><a class="record-link" th:href="@{/ui/orders/{id}/edit(id=${order.orderId()})}" th:text="${'#' + order.orderId()}">#25001</a></td>
+                                    <td th:text="${order.customerId()}">5001</td>
+                                    <td><span class="badge" th:classappend="${' badge-' + #strings.toLowerCase(order.status().name())}" th:text="${order.status()}">DELIVERED</span></td>
+                                    <td class="align-right currency" th:text="${'$' + #numbers.formatDecimal(order.totalAmount(), 1, 2)}">$120.00</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </article>
+
+                    <article class="card">
+                        <div class="card-header">
+                            <div><span class="eyebrow">Financial activity</span><h2>Recent payments</h2></div>
+                            <a class="text-link" th:href="@{/ui/payments}">View all →</a>
+                        </div>
+                        <div class="table-wrap">
+                            <table>
+                                <thead><tr><th>Payment</th><th>Method</th><th>Status</th><th class="align-right">Amount</th></tr></thead>
+                                <tbody>
+                                <tr th:each="payment : ${recentPayments}">
+                                    <td><a class="record-link" th:href="@{/ui/payments/{id}/edit(id=${payment.paymentId()})}" th:text="${'#' + payment.paymentId()}">#28001</a></td>
+                                    <td th:text="${#strings.replace(payment.paymentMethod().name(), '_', ' ')}">CARD</td>
+                                    <td><span class="badge badge-payment" th:text="${#strings.replace(payment.paymentStatus().name(), '_', ' ')}">SETTLED</span></td>
+                                    <td class="align-right currency" th:text="${'$' + #numbers.formatDecimal(payment.amount(), 1, 2)}">$120.00</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </article>
+                </div>
+
+                <aside class="insights-column" aria-label="Business insights">
+                    <article class="card chart-card">
+                        <div class="card-header">
+                            <div><span class="eyebrow">Payment intelligence</span><h2>Payment method mix</h2></div>
+                            <span class="chart-period">All records</span>
+                        </div>
+                        <div class="donut-layout">
+                            <div class="donut-chart"
+                                 role="img"
+                                 aria-label="Payment methods by transaction count"
+                                 th:style="${'background: conic-gradient(' + insights.paymentGradient() + ')'}">
+                                <div class="donut-center">
+                                    <strong th:text="${insights.paymentCount()}">20</strong>
+                                    <small>payments</small>
+                                </div>
+                            </div>
+                            <div class="chart-legend">
+                                <div class="legend-row" th:each="slice : ${insights.paymentMethods()}">
+                                    <span class="legend-dot" th:style="${'background:' + slice.color()}"></span>
+                                    <span class="legend-label" th:text="${slice.label()}">CARD</span>
+                                    <strong th:text="${slice.percentage() + '%'}">20%</strong>
+                                </div>
+                            </div>
+                        </div>
+                    </article>
+
+                    <article class="card chart-card">
+                        <div class="card-header">
+                            <div><span class="eyebrow">Revenue intelligence</span><h2>Order revenue trend</h2></div>
+                            <span class="chart-period" th:text="${insights.revenueDayCount() + ' days'}">20 days</span>
+                        </div>
+                        <div class="line-chart-summary">
+                            <span>Total order revenue</span>
+                            <strong th:text="${'$' + #numbers.formatDecimal(insights.totalRevenue(), 1, 2)}">$5,000.00</strong>
+                        </div>
+                        <div class="line-chart"
+                             data-line-chart
+                             th:attr="data-values=${insights.revenueValues()},data-labels=${insights.revenueLabels()}"
+                             role="img"
+                             aria-label="Daily order revenue line chart">
+                            <svg class="line-chart-svg" viewBox="0 0 620 230" aria-hidden="true"></svg>
+                        </div>
+                    </article>
+                </aside>
+            </section>
+        </main>
+    </section>
+</div>
+</body>
+</html>

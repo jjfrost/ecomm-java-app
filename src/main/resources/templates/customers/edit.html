@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Edit customer')}"></head>
+<body>
+<div class="app-shell">
+    <aside th:replace="~{fragments/layout :: sidebar(${activeNav})}"></aside>
+    <section class="app-main">
+        <header th:replace="~{fragments/layout :: topbar('Edit customer', 'Update customer identity and home address')}"></header>
+        <main class="content narrow-content">
+            <div th:replace="~{fragments/layout :: flash}"></div>
+            <a class="back-link" th:href="@{/ui/customers}">← Back to customers</a>
+            <section class="card form-card">
+                <div class="record-heading">
+                    <span class="entity-avatar large" th:text="${#strings.substring(customer.name(), 0, 1)}">C</span>
+                    <div><h2 th:text="${customer.name()}">Customer</h2><p th:text="${'Customer ID ' + customer.id()}">Customer ID 5001</p></div>
+                    <span class="badge badge-active" th:if="${customer.active()}">Active</span>
+                </div>
+                <div class="alert alert-error" th:if="${error}"><span>!</span><span th:text="${error}">Error</span></div>
+                <form class="data-form" th:action="@{/ui/customers/{id}(id=${customer.id()})}" th:object="${form}" method="post">
+                    <div class="form-section">
+                        <div class="section-title"><h3>Profile</h3><p>Primary customer contact information.</p></div>
+                        <div class="form-grid">
+                            <label class="field"><span>Full name</span><input th:field="*{name}" type="text"><small class="field-error" th:errors="*{name}"></small></label>
+                            <label class="field"><span>Email</span><input th:field="*{email}" type="email"><small class="field-error" th:errors="*{email}"></small></label>
+                        </div>
+                    </div>
+                    <div class="form-section">
+                        <div class="section-title"><h3>Home address</h3><p>Address fields embedded in ECOMM.CUSTOMERS.</p></div>
+                        <div class="form-grid">
+                            <label class="field field-wide"><span>Street</span><input th:field="*{street}" type="text"><small class="field-error" th:errors="*{street}"></small></label>
+                            <label class="field"><span>City</span><input th:field="*{city}" type="text"><small class="field-error" th:errors="*{city}"></small></label>
+                            <label class="field"><span>Postal code</span><input th:field="*{zip}" type="text"><small class="field-error" th:errors="*{zip}"></small></label>
+                        </div>
+                    </div>
+                    <div class="form-actions"><a class="button button-secondary" th:href="@{/ui/customers}">Cancel</a><button class="button button-primary" type="submit">Save customer</button></div>
+                </form>
+            </section>
+        </main>
+    </section>
+</div>
+</body>
+</html>

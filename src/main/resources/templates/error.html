@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Something went wrong')}"></head>
+<body class="centered-page">
+<main class="error-shell">
+    <span class="brand-mark large">!</span>
+    <span class="eyebrow">Request could not be completed</span>
+    <h1>Something went wrong</h1>
+    <p>The request was stopped safely. Return to the dashboard and try again.</p>
+    <a class="button button-primary" th:href="@{/ui/dashboard}">Return to dashboard</a>
+</main>
+</body>
+</html>
